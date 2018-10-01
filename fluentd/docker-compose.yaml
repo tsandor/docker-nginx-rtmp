@@ -1,0 +1,7 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+     - "5140:5140"      
+     - "24224:24224"

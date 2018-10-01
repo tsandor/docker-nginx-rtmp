@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.8
 LABEL author Alfred Gutierrez <alf.g.jr@gmail.com>
 
 ENV NGINX_VERSION 1.13.9
@@ -13,12 +13,14 @@ RUN mkdir -p /opt/data && mkdir /www
 # Build dependencies.
 RUN	apk update && apk add	\
   binutils \
-  binutils-libs \
+#  binutils-libs \
   build-base \
   ca-certificates \
   gcc \
   libc-dev \
   libgcc \
+  libxml2 \
+  libxslt-dev \
   make \
   musl-dev \
   openssl \
@@ -48,6 +50,8 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
   --conf-path=/opt/nginx/nginx.conf \
   --error-log-path=/opt/nginx/logs/error.log \
   --http-log-path=/opt/nginx/logs/access.log \
+  --with-http_xslt_module \
+  --with-http_ssl_module \
   --with-debug && \
   cd /tmp/nginx-${NGINX_VERSION} && make && make install
 
@@ -88,6 +92,9 @@ RUN cd /tmp/ffmpeg-${FFMPEG_VERSION} && \
 
 # Cleanup.
 RUN rm -rf /var/cache/* /tmp/*
+
+# Sync clock with ntpd
+#RUN hwclock -s
 
 # Add NGINX config and static files.
 ADD nginx.conf /opt/nginx/nginx.conf

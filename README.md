@@ -28,6 +28,30 @@ docker build -t nginx-rtmp .
 docker run -it -p 1935:1935 -p 8080:80 --rm nginx-rtmp
 ```
 
+* Run it with fluentd log driver:
+```
+mkdir -p /tmp/rec
+docker run -it --log-driver=fluentd --log-opt tag='docker.nginx.{{.ID}}' --log-opt fluentd-address=172.17.0.2:24224 -p 1935:1935 -p 8080:80 -v /tmp/rec:/srv/rec --rm --privileged nginx-rtmp
+```
+
+```
+docker build -t nginx-rtmp . 
+docker run -it --log-driver=fluentd --log-opt tag='docker.nginx.{{.ID}}' --log-opt fluentd-address=172.17.0.2:24224 -p 1935:1935 -p 8080:80 -v /tmp/rec:/srv/rec --rm nginx-rtmp
+```
+
+curl http://localhost:8080/dash/hello_720p2628kbs/index.mpd
+/tmp/dash/hello_720p2628kbs
+
+```
+docker build -t custom-fluentd:latest ./
+docker run -it --rm --name custom-docker-fluent-logger -v $(pwd)/log:/fluentd/log custom-fluentd:latest
+```
+
+* Number of clients
+```
+Use HTTP request http://localhost/nclients?app=myapp&name=mystream to get the number of stream subscribers. This number will be automatically refreshed every 3 seconds when opened in browser or iframe.
+```
+
 * Stream live content to:
 ```
 rtmp://<server ip>:1935/stream/$STREAM_NAME
